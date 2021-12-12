@@ -1,8 +1,6 @@
 const express = require('express');
 const multer = require('multer');
 const fs = require('fs');
-const res = require('express/lib/response');
-
 
 const app = express();
 
@@ -10,10 +8,7 @@ const PORT = process.env.PORT || 80;
 
 app.use(express.static(__dirname + '/'))
 
-
-
 app.get('/', (req, res) => res.redirect('/public/butonlar.html'))
-
 
 
 const storage = multer.diskStorage({
@@ -38,7 +33,7 @@ app.get('/dosyalar', (req, res, next) => {
     try {
         res.send(fs.readdirSync(defaultPath + req.query.path))
     }
-    catch(err){
+    catch (err) {
         res.send({
             error: true
         });
@@ -46,8 +41,6 @@ app.get('/dosyalar', (req, res, next) => {
 })
 
 app.post('/dosyalar', upload.any(), async (req, res, next) => {
-
-    const { path } = req.query;
 
     const files = req.files;
     const file_name = files[0].originalname;
@@ -90,8 +83,6 @@ app.get('/rename', async (req, res, next) => {  //rename?path=eskikonum&newPath=
     try {
         const { path, newName } = req.query;
 
-        console.log(defaultPath + path, defaultPath + path.split('/').slice(1, path.split('/').length - 1).join('/') + "/" + newName);
-
         await fs.renameSync(defaultPath + path, defaultPath + path.split('/').slice(1, path.split('/').length - 1).join('/') + "/" + newName);
 
         res.send("Yeniden Adlandırma Başarılı");
@@ -110,7 +101,7 @@ app.get('/rename', async (req, res, next) => {  //rename?path=eskikonum&newPath=
 app.get('/yeniKlasor', async (req, res) => {
 
     const { path } = req.query;
-console.log(path)
+
     try {
 
         await fs.mkdirSync(defaultPath + path);
