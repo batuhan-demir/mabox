@@ -33,10 +33,16 @@ const defaultPath = __dirname + '/uploads/';
 
 app.get('/dosyalar', (req, res, next) => {
 
-    console.log(req.query)
+    // console.log(req.query)
 
-    res.send(fs.readdirSync(defaultPath + req.query.path))
-
+    try {
+        res.send(fs.readdirSync(defaultPath + req.query.path))
+    }
+    catch(err){
+        res.send({
+            error: true
+        });
+    }
 })
 
 app.post('/dosyalar', upload.any(), async (req, res, next) => {
@@ -49,7 +55,7 @@ app.post('/dosyalar', upload.any(), async (req, res, next) => {
     try {
         await fs.renameSync(__dirname + "/tmp/" + file_name, defaultPath + req.query.path + "/" + file_name);
 
-        res.send(`${file_name} yüklemesi basarılı`)
+        res.send(`<script> window.onload = () => { history.back() } </script> `)
     }
     catch (err) {
         console.error(err);
@@ -66,7 +72,7 @@ app.delete('/dosyalar', async (req, res, next) => {
         if (path.includes('.'))
             await fs.unlinkSync(defaultPath + path)
         else
-            await fs.rmdirSync(defaultPath + path , { recursive:true, force: true });
+            await fs.rmdirSync(defaultPath + path, { recursive: true, force: true });
 
         res.send("Silme İşlemi Başarılı");
     }
@@ -78,20 +84,41 @@ app.delete('/dosyalar', async (req, res, next) => {
     }
 })
 
+app.get('/rename', async (req, res, next) => {  //rename?path=eskikonum&newPath=yeniKonum
+
+
+    try {
+        const { path, newName } = req.query;
+
+        console.log(defaultPath + path, defaultPath + path.split('/').slice(1, path.split('/').length - 1).join('/') + "/" + newName);
+
+        await fs.renameSync(defaultPath + path, defaultPath + path.split('/').slice(1, path.split('/').length - 1).join('/') + "/" + newName);
+
+        res.send("Yeniden Adlandırma Başarılı");
+
+    }
+    catch (err) {
+
+        console.error(err);
+
+        res.status(400).send("Yeniden Adlandırmada Hata!");
+    }
+
+})
+
 
 app.get('/yeniKlasor', async (req, res) => {
 
     const { path } = req.query;
-
-    try{
+console.log(path)
+    try {
 
         await fs.mkdirSync(defaultPath + path);
 
         res.send("Klasör Oluşturma Başarılı");
 
     }
-    catch(err)
-    {
+    catch (err) {
 
         console.error(err);
         res.status(400).send("Klasör Oluşturmada Hata!");

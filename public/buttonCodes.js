@@ -9,16 +9,28 @@ const sil = async(path) => {
     window.location.reload();
 }
 
-const yenidenAdlandir = async(path, newName) => {
-    
+const yenidenAdlandir = async(path) => {
+
+    const newPath = prompt("Yeni İsim", path.split('/')[path.split('/').length - 1]);
+
+    if(!newPath) return;
+
+    const result = await (await fetch(`/rename?path=${path}&newName=${newPath}`)).text();
+
+    console.log(result);
+
+    window.location.reload();
+
 }
 
 
-const yeniKlasor = async() => {
+const yeniKlasor = async(path) => {
 
     const dirName = prompt("Klasör Adı", "");
 
-    const result = await (await fetch('/yeniKlasor?path=' + dirName)).text();
+    if(!dirName) return;
+
+    const result = await (await fetch('/yeniKlasor?path=' + path + "/" + dirName)).text();
 
     console.log(result);
 
