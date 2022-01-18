@@ -8,7 +8,7 @@ const PORT = process.env.PORT || 80;
 
 app.use(express.static(__dirname + '/'))
 
-app.get('/', (req, res) => res.redirect('/public/index.html')) 
+app.get('/', (req, res) => res.redirect('/public/index.html'))
 
 
 const storage = multer.diskStorage({
@@ -46,8 +46,8 @@ app.post('/dosyalar', upload.any(), async (req, res, next) => {
 
   let errors = [];
 
-  for (let i = 0; i < files.length; i++)
-  {
+  for (let i = 0; i < files.length; i++) {
+
     try {
       const file_name = files[i].originalname;
 
@@ -60,12 +60,13 @@ app.post('/dosyalar', upload.any(), async (req, res, next) => {
       errors.push(`${file_name} yüklemesi basarısız`)
     }
 
-    if (errors.length > 0)
-      return res.status(400).send(errors);
-
-    else res.send(`<script> window.onload = () => { history.back() } </script> `)
-
   }
+
+  if (errors.length > 0)
+    return res.status(400).send(errors);
+
+  else res.send(`<script> window.onload = () => { history.back() } </script> `)
+
 })
 
 app.delete('/dosyalar', async (req, res, next) => {

@@ -1,14 +1,14 @@
 {
   "name": "mabox",
-  "version": "1.0.0",
-  "description": "",
+  "version": "3.2.0",
+  "description": "Basit bir dosya paylaşma merkezi.",
   "main": "index.js",
   "scripts": {
     "dev": "nodemon index.js",
     "start": "node index.js"
   },
   "keywords": [],
-  "author": "",
+  "author": "Batuhan Demir",
   "license": "ISC",
   "dependencies": {
     "dotenv": "^10.0.0",
