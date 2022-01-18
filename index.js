@@ -31,11 +31,12 @@ app.get('/dosyalar', (req, res, next) => {
   // console.log(req.query)
 
   try {
-    res.send(fs.readdirSync(defaultPath + req.query.path))
+    res.send(fs.readdirSync(defaultPath + req.query.path).filter(file => !file.startsWith('.'))) //ismi . ile başlayan dosyaları gizledik (.gitkeep gibi)
   }
   catch (err) {
     res.send({
-      error: true
+      error: true,
+      message: err
     });
   }
 })
