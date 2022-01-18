@@ -8,7 +8,7 @@ const PORT = process.env.PORT || 80;
 
 app.use(express.static(__dirname + '/'))
 
-app.get('/', (req, res) => res.redirect('/public/index.html'))
+app.get('/', (req, res) => res.redirect('/public/index.html')) 
 
 
 const storage = multer.diskStorage({
