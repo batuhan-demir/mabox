@@ -8,18 +8,18 @@ const PORT = process.env.PORT || 80;
 
 app.use(express.static(__dirname + '/'))
 
-app.get('/', (req, res) => res.redirect('/public/butonlar.html'))
+app.get('/', (req, res) => res.redirect('/public/index.html'))
 
 
 const storage = multer.diskStorage({
 
-    destination: (req, file, cb) => {
-        cb(null, 'tmp/')
-    },
+  destination: (req, file, cb) => {
+    cb(null, 'tmp/')
+  },
 
-    filename: (req, file, cb) => {
-        cb(null, file.originalname);
-    }
+  filename: (req, file, cb) => {
+    cb(null, file.originalname);
+  }
 })
 
 const upload = multer({ storage });
@@ -28,93 +28,104 @@ const defaultPath = __dirname + '/uploads/';
 
 app.get('/dosyalar', (req, res, next) => {
 
-    // console.log(req.query)
+  // console.log(req.query)
 
-    try {
-        res.send(fs.readdirSync(defaultPath + req.query.path))
-    }
-    catch (err) {
-        res.send({
-            error: true
-        });
-    }
+  try {
+    res.send(fs.readdirSync(defaultPath + req.query.path))
+  }
+  catch (err) {
+    res.send({
+      error: true
+    });
+  }
 })
 
 app.post('/dosyalar', upload.any(), async (req, res, next) => {
 
-    const files = req.files;
-    const file_name = files[0].originalname;
+  const files = req.files;
 
+  let errors = [];
+
+  for (let i = 0; i < files.length; i++)
+  {
     try {
-        await fs.renameSync(__dirname + "/tmp/" + file_name, defaultPath + req.query.path + "/" + file_name);
+      const file_name = files[i].originalname;
 
-        res.send(`<script> window.onload = () => { history.back() } </script> `)
+      await fs.renameSync(__dirname + "/tmp/" + file_name, defaultPath + req.query.path + "/" + file_name);
     }
+
     catch (err) {
-        console.error(err);
+      console.error(err);
 
-        res.status(400).send(`${file_name} yüklemesi basarısız`)
+      errors.push(`${file_name} yüklemesi basarısız`)
     }
+
+    if (errors.length > 0)
+      return res.status(400).send(errors);
+
+    else res.send(`<script> window.onload = () => { history.back() } </script> `)
+
+  }
 })
 
 app.delete('/dosyalar', async (req, res, next) => {
 
-    const { path } = req.query;
+  const { path } = req.query;
 
-    try {
-        if (path.includes('.'))
-            await fs.unlinkSync(defaultPath + path)
-        else
-            await fs.rmdirSync(defaultPath + path, { recursive: true, force: true });
+  try {
+    if (path.includes('.'))
+      await fs.unlinkSync(defaultPath + path)
+    else
+      await fs.rmdirSync(defaultPath + path, { recursive: true, force: true });
 
-        res.send("Silme İşlemi Başarılı");
-    }
-    catch (err) {
+    res.send("Silme İşlemi Başarılı");
+  }
+  catch (err) {
 
-        console.log(err)
+    console.log(err)
 
-        res.send("Dosya Silmede Hata!");
-    }
+    res.send("Dosya Silmede Hata!");
+  }
 })
 
-app.get('/rename', async (req, res, next) => {  //rename?path=eskikonum&newPath=yeniKonum
+app.get('/rename', async (req, res, next) => { //rename?path=eskikonum&newPath=yeniKonum
 
 
-    try {
-        const { path, newName } = req.query;
+  try {
+    const { path, newName } = req.query;
 
-        await fs.renameSync(defaultPath + path, defaultPath + path.split('/').slice(1, path.split('/').length - 1).join('/') + "/" + newName);
+    await fs.renameSync(defaultPath + path, defaultPath + path.split('/').slice(1, path.split('/').length - 1).join('/') + "/" + newName);
 
-        res.send("Yeniden Adlandırma Başarılı");
+    res.send("Yeniden Adlandırma Başarılı");
 
-    }
-    catch (err) {
+  }
+  catch (err) {
 
-        console.error(err);
+    console.error(err);
 
-        res.status(400).send("Yeniden Adlandırmada Hata!");
-    }
+    res.status(400).send("Yeniden Adlandırmada Hata!");
+  }
 
 })
 
 
 app.get('/yeniKlasor', async (req, res) => {
 
-    const { path } = req.query;
+  const { path } = req.query;
 
-    try {
+  try {
 
-        await fs.mkdirSync(defaultPath + path);
+    await fs.mkdirSync(defaultPath + path);
 
-        res.send("Klasör Oluşturma Başarılı");
+    res.send("Klasör Oluşturma Başarılı");
 
-    }
-    catch (err) {
+  }
+  catch (err) {
 
-        console.error(err);
-        res.status(400).send("Klasör Oluşturmada Hata!");
+    console.error(err);
+    res.status(400).send("Klasör Oluşturmada Hata!");
 
-    }
+  }
 
 })
 
