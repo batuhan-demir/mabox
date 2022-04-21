@@ -1,4 +1,5 @@
 const express = require('express');
+const cors = require('cors')
 const multer = require('multer');
 const fs = require('fs');
 
@@ -6,6 +7,7 @@ const app = express();
 
 const PORT = process.env.PORT || 80;
 
+app.use(cors());
 app.use(express.static(__dirname + '/'))
 
 app.get('/', (req, res) => res.redirect('/public/index.html'))
